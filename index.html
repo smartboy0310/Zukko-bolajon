@@ -1,0 +1,848 @@
+DOCTYPE<! html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afsonaviy bolalar kutubxonasi | Qiziqarli Kitoblar Olami</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Poppins / Fredoka (bolalarbop yumshoq shriftlar) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#FDFBF7',
+                        mint: '#E8F5E9',
+                        mintDark: '#A5D6A7',
+                        softBlue: '#E1F5FE',
+                        skyPastel: '#B3E5FC',
+                        peach: '#FFF3E0',
+                        coralPastel: '#FFAB91',
+                        lemonPastel: '#FFF9C4',
+                        lavenderPastel: '#EDE7F6',
+                        warmWood: '#D7CCC8',
+                        shelfWood: '#C8A27A',
+                        shelfWoodDark: '#8D6E63'
+                    },
+                    fontFamily: {
+                        fredoka: ['"Fredoka"', 'sans-serif'],
+                        quicksand: ['"Quicksand"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #FAF6EE;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        /* Yumshoq devor foni va pol effekti */
+        .room-wall {
+            background: linear-gradient(180deg, #F9FBE7 0%, #E8F5E9 65%, #C8E6C9 100%);
+            position: relative;
+        }
+
+        .room-floor {
+            background: repeating-linear-gradient(
+                90deg,
+                #DEC7A7 0px,
+                #DEC7A7 40px,
+                #D7BE9B 40px,
+                #D7BE9B 42px
+            );
+            box-shadow: inset 0 10px 15px rgba(0,0,0,0.06);
+        }
+
+        /* Quvnoq suzuvchi bulutlar va animatsiyalar */
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+
+        @keyframes sunWiggle {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(10deg) scale(1.05); }
+        }
+
+        @keyframes bounceSmall {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .animate-float {
+            animation: gentleFloat 4s ease-in-out infinite;
+        }
+
+        .animate-sun {
+            animation: sunWiggle 6s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .bounce-hover:hover {
+            animation: bounceSmall 0.4s ease infinite;
+        }
+
+        /* Yog'och javon 3D effekti */
+        .bookshelf-plank {
+            background: linear-gradient(180deg, #BA8C63 0%, #A0724A 100%);
+            box-shadow: 0 8px 12px rgba(100, 60, 20, 0.25), inset 0 2px 4px rgba(255,255,255,0.3);
+            border-bottom: 4px solid #795548;
+        }
+
+        .bookshelf-side {
+            background: linear-gradient(90deg, #8D6E63 0%, #A0724A 100%);
+        }
+
+        /* Kitoblar dizayni */
+        .book-spine {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: bottom center;
+            cursor: pointer;
+        }
+
+        .book-spine:hover {
+            transform: translateY(-16px) scale(1.06) rotate(2deg);
+            filter: drop-shadow(0 12px 10px rgba(0,0,0,0.2));
+            z-index: 20;
+        }
+
+        /* Bolalarbop ramkalar */
+        .photo-frame {
+            border: 8px solid #FFCC80;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        .photo-frame:hover {
+            transform: rotate(-2deg) scale(1.04);
+        }
+
+        /* Modal o'qish varag'i effekti */
+        .book-page-texture {
+            background-color: #FFFDF9;
+            background-image: radial-gradient(#F5E6CA 0.75px, transparent 0.75px);
+            background-size: 16px 16px;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F1F1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFB74D;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-700 flex flex-col justify-between">
+
+    <!-- Web Audio tovush effektlari uchun oddiy sintezator -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playChime(freq = 520, type = 'sine', duration = 0.2) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        function playHappyTone() {
+            playChime(523.25, 'triangle', 0.15); // C5
+            setTimeout(() => playChime(659.25, 'triangle', 0.15), 100); // E5
+            setTimeout(() => playChime(783.99, 'triangle', 0.25), 200); // G5
+            setTimeout(() => playChime(1046.50, 'sine', 0.35), 300); // C6
+        }
+
+        function playBookOpenTone() {
+            playChime(350, 'sine', 0.1);
+            setTimeout(() => playChime(490, 'sine', 0.15), 80);
+            setTimeout(() => playChime(700, 'sine', 0.25), 160);
+        }
+
+        function playStarTone() {
+            playChime(880, 'sine', 0.15);
+            setTimeout(() => playChime(1174, 'triangle', 0.3), 120);
+        }
+    </script>
+
+    <!-- Yuqori panel: Qiziqarli kutubxona banneri va o'yin ko'rsatkichlari -->
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b-4 border-yellow-200 px-4 py-3 shadow-sm">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Logotip va shior -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="playHappyTone()">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-300 to-orange-400 flex items-center justify-center text-white shadow-md transform hover:rotate-6 transition">
+                    <i class="fa-solid fa-book-open-reader text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-emerald-800 tracking-wide flex items-center gap-2">
+                        <span>Zukko Bolajon</span>
+                        <span class="text-sm bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full font-quicksand font-bold border border-amber-300 hidden sm:inline-block">Kutubxonasi</span>
+                    </h1>
+                    <p class="text-xs sm:text-sm text-emerald-600 font-medium">Sehrli ertaklar va bilimlar uychasi! 🌈</p>
+                </div>
+            </div>
+
+            <!-- Gamifikatsiya: Yulduzchalar va o'qilgan kitoblar -->
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl px-3 py-1.5 flex items-center gap-2 shadow-inner">
+                    <span class="text-2xl text-amber-500 animate-bounce">⭐</span>
+                    <div>
+                        <span class="text-xs text-amber-800 font-semibold block leading-tight">Yulduzchalar</span>
+                        <span id="starCounter" class="text-lg font-bold text-amber-900">12</span>
+                    </div>
+                </div>
+
+                <div class="bg-sky-50 border-2 border-sky-300 rounded-2xl px-3 py-1.5 flex items-center gap-2 shadow-inner">
+                    <span class="text-2xl text-sky-500">📖</span>
+                    <div>
+                        <span class="text-xs text-sky-800 font-semibold block leading-tight">O'qildi</span>
+                        <span id="readCount" class="text-lg font-bold text-sky-900">4 ta</span>
+                    </div>
+                </div>
+
+                <!-- Ovoz tugmasi -->
+                <button onclick="toggleAmbientSound(this)" class="p-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-2xl transition border-2 border-emerald-300 flex items-center justify-center" title="Qiziqarli ovozlar">
+                    <i class="fa-solid fa-volume-high text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ASOSIY XONA (Room Experience) -->
+    <main class="room-wall relative flex-1 pt-6 pb-12 overflow-hidden">
+        
+        <!-- Orqa fondagi devor bezaklari: Quyoshcha, bulutlar, bayroqchalar (Barchasi SVG & CSS) -->
+        <!-- Rang-barang bayroqchalar marjoni (Garland) -->
+        <div class="absolute top-0 left-0 right-0 overflow-hidden flex justify-around pointer-events-none opacity-90 z-0">
+            <div class="w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[35px] border-t-pink-400 drop-shadow-sm"></div>
+            <div class="w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[35px] border-t-amber-400 drop-shadow-sm"></div>
+            <div class="w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[35px] border-t-sky-400 drop-shadow-sm"></div>
+            <div class="w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[35px] border-t-emerald-400 drop-shadow-sm"></div>
+            <div class="w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[35px] border-t-purple-400 drop-shadow-sm"></div>
+            <div class="w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[35px] border-t-red-400 drop-shadow-sm"></div>
+            <div class="w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[35px] border-t-teal-400 drop-shadow-sm hidden md:block"></div>
+            <div class="w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[35px] border-t-yellow-400 drop-shadow-sm hidden md:block"></div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-4 relative z-10">
+
+            <!-- DEVORNING YUQORI QISMI: Quvnoq Rasmlar va Deraza -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center mb-8">
+                
+                <!-- 1-Surat: Quvnoq Kamalak & Quyoshcha -->
+                <div class="photo-frame bg-white rounded-3xl p-3 flex items-center justify-center gap-3 text-center cursor-pointer shadow-md bg-gradient-to-b from-sky-50 to-amber-50" onclick="playHappyTone()">
+                    <div class="relative w-20 h-20 flex-shrink-0 animate-sun">
+                        <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow">
+                            <!-- Quyosh tanasi -->
+                            <circle cx="50" cy="50" r="28" fill="#FFD54F" />
+                            <!-- Nurlar -->
+                            <path d="M50 10 L50 2 M50 90 L50 98 M10 50 L2 50 M90 50 L98 50 M22 22 L15 15 M78 78 L85 85 M22 78 L15 85 M78 22 L85 15" stroke="#FFA000" stroke-width="6" stroke-linecap="round" />
+                            <!-- Quvnoq ko'zlar va tabassum -->
+                            <circle cx="42" cy="46" r="3.5" fill="#3E2723" />
+                            <circle cx="58" cy="46" r="3.5" fill="#3E2723" />
+                            <circle cx="39" cy="53" r="3" fill="#FF8A80" opacity="0.6"/>
+                            <circle cx="61" cy="53" r="3" fill="#FF8A80" opacity="0.6"/>
+                            <path d="M44 54 Q50 62 56 54" stroke="#3E2723" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="text-left">
+                        <span class="text-xs uppercase font-bold text-amber-600 tracking-wider">Devordagi rasmcha</span>
+                        <h4 class="font-bold text-gray-800 text-base leading-snug">"Xayrli kun, jajji kitobxon!"</h4>
+                        <p class="text-xs text-gray-500">Bugun ajoyib kun bo'ladi ✨</p>
+                    </div>
+                </div>
+
+                <!-- 2-Surat: Sehrli Kitobxon Momiq Ayiqcha -->
+                <div class="photo-frame bg-white rounded-3xl p-3 flex items-center gap-3 shadow-md bg-gradient-to-b from-purple-50 to-pink-50 cursor-pointer" onclick="playChime(600, 'sine', 0.2)">
+                    <div class="w-20 h-20 flex-shrink-0 flex items-center justify-center text-4xl bg-amber-100 rounded-2xl shadow-inner">
+                        🧸
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase font-bold text-purple-600 tracking-wider">Kutubxona do'sti</span>
+                        <h4 class="font-bold text-gray-800 text-base leading-snug">Momiq Ayiqcha</h4>
+                        <p class="text-xs text-purple-700">"Kitob bilan dunyo kezaman!"</p>
+                    </div>
+                </div>
+
+                <!-- 3-Element: Kunning Topishmog'i kartochkasi -->
+                <div class="bg-white/95 rounded-3xl p-4 border-4 border-emerald-300 shadow-md flex flex-col justify-between relative overflow-hidden">
+                    <span class="absolute -right-3 -top-3 text-5xl opacity-15">💡</span>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="bg-emerald-100 text-emerald-800 font-bold text-xs px-2.5 py-0.5 rounded-full">Kunning topishmog'i</span>
+                            <span class="text-amber-500 font-bold text-xs flex items-center gap-1">+2 ⭐</span>
+                        </div>
+                        <p id="riddleQuestion" class="font-semibold text-slate-800 text-sm mt-1">"Tilsiz, aqlsiz, lekin hamma narsani biladi va o'rgatadi. U nima?"</p>
+                    </div>
+                    <div class="mt-3 flex gap-2">
+                        <button onclick="revealRiddleAnswer()" id="riddleBtn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow flex-1">
+                            Javobni ko'rish 👀
+                        </button>
+                        <span id="riddleAnswer" class="hidden text-xs bg-emerald-100 text-emerald-900 font-bold px-3 py-2 rounded-xl text-center border border-emerald-300 flex-1">
+                            Javob: Kitob! 📚
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KUTUBXONA JAVONI (Interactive Bookshelf) -->
+            <div class="bg-amber-100/60 p-4 sm:p-6 rounded-3xl border-4 border-amber-300/80 shadow-lg backdrop-blur-sm mb-10">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-amber-900 flex items-center gap-2">
+                            <span>📚 Sehrli Kitob Javoni</span>
+                            <span class="text-xs bg-amber-200 text-amber-900 px-3 py-1 rounded-full font-quicksand font-bold">Birini tanlang va o'qing!</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-amber-800">Kitoblar ustiga bosing, qiziqarli ertaklar va bilimlarni kashf eting.</p>
+                    </div>
+
+                    <!-- Janrlar filtri (tablar) -->
+                    <div class="flex flex-wrap gap-1.5" id="categoryFilter">
+                        <button onclick="filterCategory('all', this)" class="category-btn active px-3 py-1.5 rounded-full text-xs font-bold transition bg-emerald-600 text-white shadow">Barchasi</button>
+                        <button onclick="filterCategory('ertak', this)" class="category-btn px-3 py-1.5 rounded-full text-xs font-bold transition bg-white text-slate-600 hover:bg-amber-200">✨ Ertaklar</button>
+                        <button onclick="filterCategory('tabiat', this)" class="category-btn px-3 py-1.5 rounded-full text-xs font-bold transition bg-white text-slate-600 hover:bg-amber-200">🌿 Tabiat & Hayvonlar</button>
+                        <button onclick="filterCategory('fan', this)" class="category-btn px-3 py-1.5 rounded-full text-xs font-bold transition bg-white text-slate-600 hover:bg-amber-200">🚀 Qiziqarli Fan</button>
+                        <button onclick="filterCategory('odob', this)" class="category-btn px-3 py-1.5 rounded-full text-xs font-bold transition bg-white text-slate-600 hover:bg-amber-200">🌟 Odobnoma</button>
+                    </div>
+                </div>
+
+                <!-- 1-Javon Qavati -->
+                <div class="relative pt-6">
+                    <!-- Kitoblar qatori -->
+                    <div id="booksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6 px-4 z-10 relative">
+                        <!-- Kitoblar JavaScript orqali dinamik joylashtiriladi -->
+                    </div>
+                    <!-- Yog'och taxta (Plank) -->
+                    <div class="bookshelf-plank h-6 w-full rounded-b-md mt-2"></div>
+                </div>
+
+                <!-- Javon ostidagi qo'shimcha bezak taxtasi -->
+                <div class="flex justify-between px-6 -mt-1 text-amber-800/40 text-xs font-mono">
+                    <span>▲ yog'och suyanchiq</span>
+                    <span>▲ yog'och suyanchiq</span>
+                </div>
+            </div>
+
+            <!-- INTERYER: Bolalarbop O'qish Burchagi (Stol-stullar, yumshoq yostiqlar) -->
+            <div class="bg-white/80 rounded-3xl p-6 border-4 border-yellow-200 shadow-md">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl sm:text-2xl font-bold text-teal-800">🪑 Bolalarbop Qulay O'qish Burchagi</h3>
+                    <p class="text-xs sm:text-sm text-slate-600">Rang-barang mittivoy stol-stullarda bemalol dam oling va o'qing!</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    
+                    <!-- 1. Moviy rangli quloqli stulcha -->
+                    <div class="bg-gradient-to-b from-sky-100 to-sky-200 p-4 rounded-3xl border-3 border-sky-300 text-center hover:shadow-lg transition cursor-pointer" onclick="sitOnChair('Moviy Quloqli Stulcha')">
+                        <div class="w-16 h-16 mx-auto bg-sky-400 text-white rounded-full flex items-center justify-center text-3xl shadow-inner mb-3">
+                            🐰
+                        </div>
+                        <h4 class="font-bold text-sky-900 text-base">Quloqli Kreslo</h4>
+                        <p class="text-xs text-sky-700 mt-1">Yumshoqqina va quyon quloqli orqa suyanchiq.</p>
+                        <span class="inline-block mt-3 text-xs bg-white text-sky-700 font-bold px-3 py-1 rounded-full shadow-sm">Bu yerga o'tirish 🪑</span>
+                    </div>
+
+                    <!-- 2. Quvnoq Yumaloq Bolalar Stoli (Markaz) -->
+                    <div class="bg-gradient-to-b from-amber-100 to-amber-200 p-5 rounded-3xl border-4 border-amber-300 text-center relative shadow-inner">
+                        <div class="w-20 h-20 mx-auto bg-amber-400 rounded-full flex items-center justify-center text-4xl shadow-md mb-2">
+                            🎨
+                        </div>
+                        <h4 class="font-bold text-amber-950 text-base">Mo''jizaviy Stolcha</h4>
+                        <p class="text-xs text-amber-800 mt-1">Rangli qalamlar, yorqin bo'yoqlar va ertak daftari tayyor.</p>
+                        
+                        <div class="mt-3 flex justify-center gap-2">
+                            <span class="w-4 h-4 rounded-full bg-red-400"></span>
+                            <span class="w-4 h-4 rounded-full bg-blue-400"></span>
+                            <span class="w-4 h-4 rounded-full bg-green-400"></span>
+                            <span class="w-4 h-4 rounded-full bg-yellow-400"></span>
+                            <span class="w-4 h-4 rounded-full bg-purple-400"></span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Yashil Baqaloq Yostiqcha & Sariq Stulcha -->
+                    <div class="bg-gradient-to-b from-emerald-100 to-emerald-200 p-4 rounded-3xl border-3 border-emerald-300 text-center hover:shadow-lg transition cursor-pointer" onclick="sitOnChair('Momiq Yostiqcha')">
+                        <div class="w-16 h-16 mx-auto bg-emerald-400 text-white rounded-full flex items-center justify-center text-3xl shadow-inner mb-3">
+                            🐸
+                        </div>
+                        <h4 class="font-bold text-emerald-900 text-base">Baqaloq Yostiqcha</h4>
+                        <p class="text-xs text-emerald-700 mt-1">Polga qo'yib bemalol yotib o'qish uchun ayni muddao.</p>
+                        <span class="inline-block mt-3 text-xs bg-white text-emerald-700 font-bold px-3 py-1 rounded-full shadow-sm">Bu yerga cho'zilish 🛋️</span>
+                    </div>
+
+                </div>
+
+                <!-- Holat ko'rsatkich xabarnomasi -->
+                <div id="seatNotice" class="hidden mt-4 text-center p-2.5 bg-yellow-100 text-yellow-900 font-bold rounded-2xl border border-yellow-300 text-xs sm:text-sm animate-fade-in">
+                    <!-- Dinamik xabar -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- POL QISMI: Pol taxtalari, gilamcha va o'yinchoqlar -->
+    <section class="room-floor py-6 border-t-8 border-amber-900/10">
+        <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Quvnoq rangli dumaloq gilamcha -->
+            <div class="flex items-center gap-3 bg-white/70 backdrop-blur-sm p-3 rounded-2xl border-2 border-amber-200">
+                <span class="text-3xl">🧶</span>
+                <div class="text-xs">
+                    <b class="text-amber-900">Yumshoq Kamalak Gilam</b>
+                    <p class="text-slate-500">Oyoqchalaringiz sovuq qotmasin!</p>
+                </div>
+            </div>
+
+            <!-- O'yinchoq do'stlar -->
+            <div class="flex items-center gap-4 text-3xl">
+                <span class="hover:scale-125 transition cursor-pointer" title="Quruvchi kubiklar" onclick="playChime(400, 'square', 0.1)">🧩</span>
+                <span class="hover:scale-125 transition cursor-pointer" title="Globus sayohati" onclick="playChime(600, 'triangle', 0.15)">🌍</span>
+                <span class="hover:scale-125 transition cursor-pointer" title="Sehrli samolyotcha" onclick="playChime(800, 'sine', 0.2)">✈️</span>
+                <span class="hover:scale-125 transition cursor-pointer" title="Dinozavrcha" onclick="playChime(250, 'sawtooth', 0.2)">🦖</span>
+            </div>
+
+            <!-- Kutubxona qoidasi -->
+            <div class="text-xs text-amber-950 font-bold bg-amber-200/80 px-4 py-2 rounded-xl">
+                ❤️ "Kitoblarni ehtiyotlab, varaqlarini toza saqlaymiz!"
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-emerald-800 text-white py-4 px-4 text-center text-xs">
+        <p class="font-medium">✨ Bolajonlar uchun mehr bilan yaratilgan Sehrli Kutubxona © 2026. Barcha ertaklar va bilimlar bepul va ochiq!</p>
+    </footer>
+
+    <!-- INTERAKTIV KITOB O'QISH MODALI (Magic Book Reader) -->
+    <div id="bookModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-6 transition-opacity">
+        <div class="bg-amber-50 w-full max-w-2xl rounded-3xl shadow-2xl border-4 sm:border-8 border-amber-300 overflow-hidden flex flex-col max-h-[92vh] transform transition-all scale-95" id="modalContainer">
+            
+            <!-- Modal header -->
+            <div class="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400 p-4 flex items-center justify-between text-white">
+                <div class="flex items-center gap-2">
+                    <span id="modalIcon" class="text-2xl">📖</span>
+                    <div>
+                        <h3 id="modalTitle" class="font-bold text-lg sm:text-xl font-heading leading-tight">Kitob nomi</h3>
+                        <span id="modalCategory" class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-semibold">Janr</span>
+                    </div>
+                </div>
+                <button onclick="closeBookModal()" class="w-9 h-9 bg-white/30 hover:bg-white text-amber-900 rounded-full flex items-center justify-center text-lg font-bold transition">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Modal body: Kitob sahifasi -->
+            <div class="p-5 sm:p-8 overflow-y-auto flex-1 book-page-texture">
+                <div class="max-w-xl mx-auto">
+                    
+                    <!-- Katta rasm / vizual belgisi -->
+                    <div id="modalIllustration" class="w-full h-40 sm:h-48 rounded-2xl flex flex-col items-center justify-center text-center p-4 mb-5 border-2 border-dashed border-amber-300 shadow-inner">
+                        <!-- SVG / Icon rasmi -->
+                    </div>
+
+                    <!-- Kitob matni -->
+                    <div class="bg-white/90 p-5 rounded-2xl shadow-sm border border-amber-200">
+                        <p id="modalText" class="text-slate-800 text-base sm:text-lg leading-relaxed font-quicksand font-medium">
+                            <!-- Matn bu yerga keladi -->
+                        </p>
+
+                        <!-- Kichik ibrat / xulosa -->
+                        <div id="modalMoral" class="mt-4 p-3 bg-emerald-50 border-l-4 border-emerald-400 rounded-r-xl text-xs sm:text-sm text-emerald-900 font-semibold">
+                            <!-- Ibratli xulosa -->
+                        </div>
+                    </div>
+
+                    <!-- Mini savol / qiziqarli vazifa -->
+                    <div class="mt-4 p-3 bg-amber-100/70 rounded-2xl flex items-center justify-between gap-3 text-xs sm:text-sm text-amber-900">
+                        <span class="flex items-center gap-2">
+                            <span class="text-xl">🌟</span>
+                            <span id="readingRewardText">Ushbu ertakni o'qib bo'ldingizmi?</span>
+                        </span>
+                        <button onclick="claimBookReward()" id="rewardBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-xl shadow transition">
+                            +1 Yulduzcha olish! ⭐
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Modal footer (Amallar) -->
+            <div class="bg-amber-100/80 p-3 sm:p-4 border-t-2 border-amber-200 flex flex-wrap items-center justify-between gap-2">
+                <button onclick="readAloudText()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-2xl font-bold text-xs sm:text-sm transition shadow">
+                    <i class="fa-solid fa-volume-high"></i>
+                    <span id="speechBtnLabel">Ovozli eshitish</span>
+                </button>
+
+                <div class="flex gap-2">
+                    <button onclick="playPageTurnSound()" class="bg-white hover:bg-amber-200 text-amber-900 font-bold px-4 py-2 rounded-2xl text-xs sm:text-sm border border-amber-300 transition">
+                        Keyingi sahifa ➔
+                    </button>
+                    <button onclick="closeBookModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-2xl text-xs sm:text-sm transition">
+                        Yopish
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT KODI (Ma'lumotlar, mantiq va hodisalar) -->
+    <script>
+        // Kitoblar ro'yxati (Boyitilgan, o'zbek tilidagi ertaklar va bolalar uchun qiziqarli bilimlardan iborat)
+        const booksData = [
+            {
+                id: 1,
+                title: "Oltin Tarvuz",
+                category: "ertak",
+                categoryName: "Sehrli Ertak",
+                spineColor: "bg-emerald-500",
+                coverColor: "from-emerald-400 to-green-600",
+                textColor: "text-white",
+                heightClass: "h-48",
+                icon: "🍉",
+                illustrationBg: "bg-emerald-50",
+                svgArt: `
+                    <div class="text-6xl animate-bounce">🍉</div>
+                    <span class="text-sm font-bold text-emerald-800 mt-2">Mehribon dehqon va qaqnus qush</span>
+                `,
+                content: "Qadim zamonda bir bevafo va zolim boy hamda beozor, mehnatkash bir dehqon yashagan ekan. Bir kuni mehmondo'st kambag'al dehqon qanoti singan qushchani ko'rib, uni uyiga olib kelib davolabdi. Qush shifo topgach, unga minnatdorchilik sifatida kichik tarvuz urug'ini beribdi. Dehqon uni ekib parvarishlaganida, ichidan tilla-kumushlar to'la oltin tarvuz yetishib chiqibdi!",
+                moral: "Ibrat: Yaxshilik hech qachon unutilmaydi. Barcha jonzotlarga mehrli bo'lish saodat keltiradi."
+            },
+            {
+                id: 2,
+                title: "Zumrad va Qimmat",
+                category: "ertak",
+                categoryName: "Sehrli Ertak",
+                spineColor: "bg-pink-500",
+                coverColor: "from-pink-400 to-rose-600",
+                textColor: "text-white",
+                heightClass: "h-52",
+                icon: "👑",
+                illustrationBg: "bg-pink-50",
+                svgArt: `
+                    <div class="text-6xl animate-pulse">✨🧰✨</div>
+                    <span class="text-sm font-bold text-pink-800 mt-2">Sehrli sandiqlar siri</span>
+                `,
+                content: "Zumrad o'zining mehnatsevarligi, shirinso'zligi va kattalarni hurmat qilishi bilan keksa onaxonning olqishiga sazovor bo'libdi. Onaxon unga qizil emas, balki oddiy ko'k sandiqchani tanlashni aytibdi. Zumrad uyiga kelib ochganda, u sandiq to'la qimmatbaho javohirlar va go'zal kiyimlarga aylanibdi. Dangasa va erka Qimmat esa mehnatsiz mukofot izlab pand yebdi.",
+                moral: "Ibrat: Kamtarlik, shirinso'zlik va halol mehnat insonni doimo yuksaltiradi."
+            },
+            {
+                id: 3,
+                title: "Quyosh va Sayyoralar",
+                category: "fan",
+                categoryName: "Qiziqarli Fan",
+                spineColor: "bg-sky-500",
+                coverColor: "from-sky-400 to-blue-600",
+                textColor: "text-white",
+                heightClass: "h-44",
+                icon: "🪐",
+                illustrationBg: "bg-sky-50",
+                svgArt: `
+                    <div class="text-6xl animate-spin" style="animation-duration: 12s;">🪐</div>
+                    <span class="text-sm font-bold text-sky-800 mt-2">Koinot bo'ylab sayohat</span>
+                `,
+                content: "Biz yashab turgan Yer sayyorasi Quyosh atrofida aylanuvchi 8 ta asosiy sayyoralardan biridir. Quyosh shu qadar kattaki, uning ichiga 1 milliondan ortiq Yer sig'ishi mumkin! Eng yaqin sayyora Merkuriy, eng sovuq va ulkan gaz giganti esa Yupiter hisoblanadi. Osmondagi yulduzlar esa xuddi bizning Quyoshimiz kabi uzoq-uzoqlardagi olovli sharlardir.",
+                moral: "Qiziqarli fakt: Koinotda tovush tarqalmaydi, u yerda doim mukammal sukunat hukm suradi!"
+            },
+            {
+                id: 4,
+                title: "Aqlli Chumoli",
+                category: "tabiat",
+                categoryName: "Tabiat Mo'jizasi",
+                spineColor: "bg-amber-600",
+                coverColor: "from-amber-500 to-amber-700",
+                textColor: "text-white",
+                heightClass: "h-48",
+                icon: "🐜",
+                illustrationBg: "bg-amber-50",
+                svgArt: `
+                    <div class="text-6xl">🐜🌾</div>
+                    <span class="text-sm font-bold text-amber-900 mt-2">Birlashgan daryo bo'lar</span>
+                `,
+                content: "Mittivoy chumolilar dunyodagi eng mehnatkash va intizomli jonzotlardir. Ular o'z vaznidan 50 barobar og'irroq yukni ko'tara oladi! Tasavvur qiling, agar siz chumolidek kuchli bo'lganingizda, bitta yengil mashinani bir o'zingiz ko'tara olardingiz. Ular bir-birlariga doim yordam beradi va hech qachon urushmasdan birdamlikda uycha qurishadi.",
+                moral: "Ibrat: Birlikda kuch ko'p. Do'stlar bilan hamjihat bo'lsangiz, har qanday qiyin ishni oson bitirasiz."
+            },
+            {
+                id: 5,
+                title: "Sehrli So'zlar",
+                category: "odob",
+                categoryName: "Odobnoma",
+                spineColor: "bg-purple-500",
+                coverColor: "from-purple-400 to-indigo-600",
+                textColor: "text-white",
+                heightClass: "h-52",
+                icon: "🌸",
+                illustrationBg: "bg-purple-50",
+                svgArt: `
+                    <div class="text-6xl">🤝💖</div>
+                    <span class="text-sm font-bold text-purple-800 mt-2">"Rahmat", "Iltimos" va "Salom"</span>
+                `,
+                content: "Dunyoda shunday qudratli so'zlar borki, ular eng xafa insonning ham yuziga tabassum ulashadi. Bular: 'Iltimos', 'Katta rahmat', 'Xayrli tong' va 'Kechirasiz'. Ushbu sehrli kalit so'zlarni muntazam ishlatadigan bolalarni barcha yaxshi ko'radi va ularga doimo quvonch bilan javob qaytaradi.",
+                moral: "Qoida: Oltin kalit qulfni ochsa, shirin so'z yuraklarni ochadi!"
+            },
+            {
+                id: 6,
+                title: "Suv Tomchisining Sarguzashti",
+                category: "fan",
+                categoryName: "Qiziqarli Fan",
+                spineColor: "bg-cyan-500",
+                coverColor: "from-cyan-400 to-teal-600",
+                textColor: "text-white",
+                heightClass: "h-44",
+                icon: "💧",
+                illustrationBg: "bg-cyan-50",
+                svgArt: `
+                    <div class="text-6xl animate-pulse">💧☁️🌧️</div>
+                    <span class="text-sm font-bold text-cyan-800 mt-2">Tabiatda suvning aylanishi</span>
+                `,
+                content: "Mittivoy tomchi 'Tomchiqvoy' daryoda suzib yurgan edi. Quyosh uni qizdirgach, u bug'ga aylanib baland osmonga — momiq oq bulutlar bag'riga uchib ketdi. Shamol esib, sovuq havoga yetganda, u yomg'ir bo'lib yana gulzorlar, daraxtlar va chanqagan yer bag'riga yog'ib, barchaga hayot ulashdi.",
+                moral: "Bilib oling: Suvni asrash — tabiatni va o'zimizni asrash demakdir!"
+            }
+        ];
+
+        let userStars = 12;
+        let readBooks = 4;
+        let activeBook = null;
+        let ambientPlaying = false;
+
+        // Sahifani render qilish
+        function renderBooks(booksToRender) {
+            const grid = document.getElementById('booksGrid');
+            grid.innerHTML = '';
+
+            booksToRender.forEach(book => {
+                const bookCard = document.createElement('div');
+                bookCard.className = `book-spine ${book.heightClass} ${book.spineColor} rounded-t-xl rounded-b-sm p-2 flex flex-col justify-between items-center text-center shadow-lg border-l-4 border-white/30 relative select-none group`;
+                bookCard.onclick = () => openBook(book);
+
+                bookCard.innerHTML = `
+                    <!-- Kitob tepasi / bobi -->
+                    <div class="w-full flex justify-between items-center px-1 text-white/80 text-[10px]">
+                        <span>★</span>
+                        <span class="text-xs font-bold">${book.icon}</span>
+                        <span>★</span>
+                    </div>
+
+                    <!-- Kitob nomi (vertikal/gorizontal chiroyli uslubda) -->
+                    <div class="my-auto">
+                        <span class="text-[11px] uppercase tracking-wider font-extrabold text-white line-clamp-3 leading-snug drop-shadow-sm font-heading">
+                            ${book.title}
+                        </span>
+                        <span class="text-[9px] text-white/90 bg-black/20 px-1.5 py-0.5 rounded-full mt-1 inline-block">
+                            ${book.categoryName}
+                        </span>
+                    </div>
+
+                    <!-- Kitob osti / tilla naqsh chizig'i -->
+                    <div class="w-full border-t-2 border-yellow-200/50 pt-1 flex justify-center text-[10px] text-amber-200">
+                        <i class="fa-solid fa-bookmark"></i>
+                    </div>
+                `;
+                grid.appendChild(bookCard);
+            });
+        }
+
+        // Kategoriya bo'yicha saralash
+        function filterCategory(category, btn) {
+            playChime(440, 'triangle', 0.1);
+            
+            // Tugmalar aktivligini yangilash
+            document.querySelectorAll('.category-btn').forEach(b => {
+                b.className = "category-btn px-3 py-1.5 rounded-full text-xs font-bold transition bg-white text-slate-600 hover:bg-amber-200";
+            });
+            btn.className = "category-btn active px-3 py-1.5 rounded-full text-xs font-bold transition bg-emerald-600 text-white shadow";
+
+            if (category === 'all') {
+                renderBooks(booksData);
+            } else {
+                const filtered = booksData.filter(b => b.category === category);
+                renderBooks(filtered);
+            }
+        }
+
+        // Kitob modalini ochish
+        function openBook(book) {
+            activeBook = book;
+            playBookOpenTone();
+
+            document.getElementById('modalTitle').innerText = book.title;
+            document.getElementById('modalCategory').innerText = book.categoryName;
+            document.getElementById('modalIcon').innerText = book.icon;
+            document.getElementById('modalText').innerText = book.content;
+            document.getElementById('modalMoral').innerText = book.moral;
+            
+            const illustDiv = document.getElementById('modalIllustration');
+            illustDiv.className = `w-full h-40 sm:h-48 rounded-2xl flex flex-col items-center justify-center text-center p-4 mb-5 border-2 border-dashed border-amber-300 shadow-inner ${book.illustrationBg}`;
+            illustDiv.innerHTML = book.svgArt;
+
+            const modal = document.getElementById('bookModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('modalContainer').classList.remove('scale-95');
+                document.getElementById('modalContainer').classList.add('scale-100');
+            }, 10);
+
+            // Mukofot tugmasini tiklash
+            const rewardBtn = document.getElementById('rewardBtn');
+            rewardBtn.disabled = false;
+            rewardBtn.innerText = "+1 Yulduzcha olish! ⭐";
+            rewardBtn.className = "bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-xl shadow transition";
+        }
+
+        // Kitob modalini yopish
+        function closeBookModal() {
+            playChime(300, 'sine', 0.15);
+            // Speech synthesizerni to'xtatish
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            document.getElementById('speechBtnLabel').innerText = "Ovozli eshitish";
+
+            document.getElementById('modalContainer').classList.add('scale-95');
+            document.getElementById('modalContainer').classList.remove('scale-100');
+            setTimeout(() => {
+                document.getElementById('bookModal').classList.add('hidden');
+            }, 150);
+        }
+
+        // Yulduzcha olish (Gamification)
+        function claimBookReward() {
+            playStarTone();
+            userStars += 1;
+            readBooks += 1;
+            document.getElementById('starCounter').innerText = userStars;
+            document.getElementById('readCount').innerText = `${readBooks} ta`;
+
+            const rewardBtn = document.getElementById('rewardBtn');
+            rewardBtn.disabled = true;
+            rewardBtn.innerText = "Barakalla! Olingan ✅";
+            rewardBtn.className = "bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl cursor-default";
+
+            // Kichik konfetti effekti
+            showStarAnimation();
+        }
+
+        function showStarAnimation() {
+            const star = document.createElement('div');
+            star.innerText = "⭐ +1";
+            star.className = "fixed text-2xl font-bold text-amber-500 z-50 pointer-events-none animate-bounce";
+            star.style.left = "50%";
+            star.style.top = "40%";
+            document.body.appendChild(star);
+            setTimeout(() => star.remove(), 1000);
+        }
+
+        // Ovozli o'qish (Web Speech API)
+        function readAloudText() {
+            if (!('speechSynthesis' in window)) {
+                alert("Brauzeringiz ovozli o'qishni qo'llab-quvvatlamaydi.");
+                return;
+            }
+
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                document.getElementById('speechBtnLabel').innerText = "Ovozli eshitish";
+                return;
+            }
+
+            if (activeBook) {
+                const utterance = new SpeechSynthesisUtterance(activeBook.title + ". " + activeBook.content);
+                utterance.lang = 'uz-UZ'; // Agar uz bo'lmasa, mos keladigan ovozda o'qiladi
+                utterance.rate = 0.9; // Bolalar uchun sal sekinroq, dona-dona
+
+                utterance.onstart = () => {
+                    document.getElementById('speechBtnLabel').innerText = "To'xtatish ⏹️";
+                };
+
+                utterance.onend = () => {
+                    document.getElementById('speechBtnLabel').innerText = "Ovozli eshitish";
+                };
+
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Varaqlash ovozi
+        function playPageTurnSound() {
+            playChime(650, 'sine', 0.1);
+            setTimeout(() => playChime(500, 'triangle', 0.1), 50);
+        }
+
+        // Kunning topishmog'i
+        let riddleSolved = false;
+        function revealRiddleAnswer() {
+            if (!riddleSolved) {
+                playStarTone();
+                userStars += 2;
+                document.getElementById('starCounter').innerText = userStars;
+                riddleSolved = true;
+            }
+            document.getElementById('riddleBtn').classList.add('hidden');
+            document.getElementById('riddleAnswer').classList.remove('hidden');
+        }
+
+        // Kreslo va stullarga o'tirish interaksiyasi
+        function sitOnChair(chairName) {
+            playHappyTone();
+            const notice = document.getElementById('seatNotice');
+            notice.innerHTML = `🎉 Siz <b>${chairName}</b>ga qulay o'tirib oldingiz! Endi xushchaqchaqlik bilan kitob mutolaa qiling. 📖✨`;
+            notice.classList.remove('hidden');
+            setTimeout(() => {
+                notice.classList.add('hidden');
+            }, 4500);
+        }
+
+        // Fon tovushini boshqarish
+        function toggleAmbientSound(btn) {
+            ambientPlaying = !ambientPlaying;
+            if (ambientPlaying) {
+                playHappyTone();
+                btn.classList.add('bg-amber-300', 'text-amber-900');
+                btn.classList.remove('bg-emerald-100', 'text-emerald-700');
+            } else {
+                playChime(300, 'sine', 0.2);
+                btn.classList.remove('bg-amber-300', 'text-amber-900');
+                btn.classList.add('bg-emerald-100', 'text-emerald-700');
+            }
+        }
+
+        // Ilk yuklanishda kutubxona kitoblarini chizish
+        window.onload = function() {
+            renderBooks(booksData);
+        };
+    </script>
+</body>
+</html>
